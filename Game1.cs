@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework.Media;
 using Microsoft.Xna.Framework.Audio;
 using System;
 using System.Threading;
+using System.Diagnostics;
 using System.Collections.Generic;
 
 namespace Space_Invators
@@ -15,30 +16,28 @@ namespace Space_Invators
 
         GameState _state; 
         MouseState mouse;
-        Texture2D P1Pic, BulletPic, EnemyPic;
+        Texture2D P1Pic, BulletPic, EnemyPic, HousePic, HousePicDamage, EnemyBullet;
 
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
 
         public static int Width = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
-        public static int Height = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
+        public static int Height = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height + 150;
 
         bool Hit = false;
 
 
         // ints
         int MovmentSpeed = 8;
-        int test = 0;
+        int xChange = 110;
+        int yChange = Width / 10;
+        int HouseHitPoint;
 
-        List<Rectangle> rects = new List<Rectangle>();
-        
+        List<Rectangle> rectList = new List<Rectangle>();
 
         //Rectangle
         Rectangle RectP1 = new Rectangle(Width/2, Height /2 + 500, 80, 80);
-        Rectangle EnemyRect1 = new Rectangle(0, Height/5, 80, 80);
         Rectangle BulletRect;
-
-
 
         // Vector
         Vector2 BulletSpeed;
@@ -75,7 +74,18 @@ namespace Space_Invators
             P1Pic = Content.Load<Texture2D>("parrot");
             BulletPic = Content.Load<Texture2D>("ball");
             EnemyPic = Content.Load<Texture2D>("LargeAlien");
-            // TODO: use this.Content to load your game content here
+            //HousePic = Content.Load<Texture2D>("HousePic");
+            //HousePicDamage = Content.Load<Texture2D>("HousePicDamage");
+            //EnemyBullet = Content.Load<Texture2D>("EnemyBullet");
+
+
+            // Set position of enenmy with start
+            for (int i = 0; i < 10; i++)
+            {
+                rectList.Add(new Rectangle(xChange, yChange, 80, 80));
+                xChange += 180;
+            }
+
         }
 
         protected override void Update(GameTime gameTime)
@@ -118,13 +128,18 @@ namespace Space_Invators
             // Player Draw
             _spriteBatch.Draw(P1Pic, RectP1, Color.White);
             _spriteBatch.Draw(BulletPic, BulletPosition, Color.White);
-            _spriteBatch.Draw(EnemyPic, EnemyRect1, Color.White);
+
+            foreach (Rectangle rect in rectList)
+            {
+                _spriteBatch.Draw(EnemyPic, rect, Color.White);
+            }
+
             _spriteBatch.End();
 
             BulletPosition += BulletSpeed;
 
             MovementPlayer();
-
+            Collision();
 
             base.Draw(gameTime);
         }
@@ -169,14 +184,18 @@ namespace Space_Invators
 
         }
 
-        void Collicon()
+        void Collision()
         {
             BulletRect.Y = (int)BulletPosition.Y;
             BulletRect.X = (int)BulletPosition.X;
 
-            if (BulletRect.Intersects(EnemyRect1) == true);
+            foreach (var Enemy in rectList)
             {
-                test++;
+                if (BulletRect.Intersects(Enemy) == true)
+                {
+                    Debug.WriteLine("Hit");
+                    rectList.Remove(Enemy);
+                }
             }
         }
     }   
