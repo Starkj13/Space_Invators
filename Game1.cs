@@ -16,7 +16,7 @@ namespace Space_Invators
 
         GameState _state; 
         MouseState mouse;
-        Texture2D P1Pic, BulletPic, EnemyPic, HousePic, HousePicDamage, EnemyBullet;
+        Texture2D P1Pic, BulletPic, EnemyPic, HouseMainPic, HouseDamagePic, EnemyBulletPic;
 
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
@@ -32,16 +32,21 @@ namespace Space_Invators
         int xChange = 110;
         int yChange = Width / 10;
         int HouseHitPoint;
+        int EnemyFire;
 
         List<Rectangle> rectList = new List<Rectangle>();
 
         //Rectangle
-        Rectangle RectP1 = new Rectangle(Width/2, Height /2 + 500, 80, 80);
+        Rectangle RectP1 = new Rectangle(Width/2, Height /2 + 300, 80, 80);
+        Rectangle HouseRect = new Rectangle(Width / 4, Height/2 + 400, 500, 500);
+        Rectangle EnemyBulletRect;
         Rectangle BulletRect;
 
         // Vector
         Vector2 BulletSpeed;
         Vector2 BulletPosition;
+        Vector2 EnemyBulletSpeed;
+        Vector2 EnemyBulletPosition;
 
         enum GameState
         {
@@ -74,9 +79,9 @@ namespace Space_Invators
             P1Pic = Content.Load<Texture2D>("parrot");
             BulletPic = Content.Load<Texture2D>("ball");
             EnemyPic = Content.Load<Texture2D>("LargeAlien");
-            //HousePic = Content.Load<Texture2D>("HousePic");
-            //HousePicDamage = Content.Load<Texture2D>("HousePicDamage");
-            //EnemyBullet = Content.Load<Texture2D>("EnemyBullet");
+            HouseMainPic = Content.Load<Texture2D>("SpaceInvaders_House");
+            HouseDamagePic = Content.Load<Texture2D>("SpaceInvaders_House_Damage");
+            EnemyBulletPic = Content.Load<Texture2D>("SpaceInvaders_EnemyBullet");
 
 
             // Set position of enenmy with start
@@ -128,7 +133,10 @@ namespace Space_Invators
             // Player Draw
             _spriteBatch.Draw(P1Pic, RectP1, Color.White);
             _spriteBatch.Draw(BulletPic, BulletPosition, Color.White);
+            _spriteBatch.Draw(HouseMainPic, HouseRect, Color.White);
+            _spriteBatch.Draw(EnemyBulletPic, EnemyBulletPosition, Color.White);
 
+            // Draw Enemy
             foreach (Rectangle rect in rectList)
             {
                 _spriteBatch.Draw(EnemyPic, rect, Color.White);
@@ -137,9 +145,11 @@ namespace Space_Invators
             _spriteBatch.End();
 
             BulletPosition += BulletSpeed;
+            EnemyBulletPosition += EnemyBulletSpeed;
 
             MovementPlayer();
-            Collision();
+            EnemyBulletCollision();
+            BulletCollision();
 
             base.Draw(gameTime);
         }
@@ -168,9 +178,9 @@ namespace Space_Invators
             }
 
 
-            if (mouse.LeftButton == ButtonState.Pressed && Hit == false)
+            if (KeyboardState.IsKeyDown((Keys.Space)) && Hit == false)
             {
-                BulletPosition.X = RectP1.X;
+                BulletPosition.X = RectP1.X+25;
                 BulletPosition.Y = RectP1.Y;
 
                 BulletSpeed.Y = Random.Next(-10, -5);
@@ -184,19 +194,46 @@ namespace Space_Invators
 
         }
 
-        void Collision()
+        void BulletCollision()
         {
             BulletRect.Y = (int)BulletPosition.Y;
             BulletRect.X = (int)BulletPosition.X;
 
-            foreach (var Enemy in rectList)
+            for (int i = 0; i < rectList.Count; i++)
             {
-                if (BulletRect.Intersects(Enemy) == true)
+                if (rectList[i].Intersects(BulletRect) == true)
                 {
-                    Debug.WriteLine("Hit");
-                    rectList.Remove(Enemy);
+                    rectList.RemoveAt(i);
                 }
             }
+            
+            
+            if (HouseRect.Intersects(EnemyBulletRect) == true)
+            {
+                HouseMainPic = HouseDamagePic;
+            }
+        }
+
+        void EnemyBulletCollision()
+        {
+
+            EnemyBulletRect.Y = (int)EnemyBulletPosition.Y;
+            EnemyBulletRect.X = (int)EnemyBulletPosition.X;
+
+            EnemyFire = Random.Next(0, 10);
+
+            EnemyBulletSpeed.Y = Random.Next(-10, -5);
+
+            EnemyBulletPosition.X = rectList[EnemyFire].X;
+            EnemyBulletPosition.Y = rectList[EnemyFire].Y;
+            //make it reset
+         
+        }
+
+        void EnemyMovment()
+        {
+
+
         }
     }   
 }
