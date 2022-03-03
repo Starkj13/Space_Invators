@@ -1,11 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Media;
-using Microsoft.Xna.Framework.Audio;
 using System;
-using System.Threading;
-using System.Diagnostics;
 using System.Collections.Generic;
 
 namespace Space_Invators
@@ -16,7 +12,8 @@ namespace Space_Invators
 
         GameState _state;
         MouseState mouse;
-        Texture2D P1Pic, BulletPic, EnemyPic, HouseMainPic, HouseDamagePic, EnemyBulletPic;
+        SpriteFont arialFont;
+        Texture2D P1Pic, BulletPic, EnemyPic, HouseMainPic, HouseDamagePic, EnemyBulletPic, Background;
 
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
@@ -24,27 +21,32 @@ namespace Space_Invators
         public static int Width = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
         public static int Height = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height + 150;
 
-        bool Hit = false;
-
-
-        // ints
+        // Ints
         int MovmentSpeed = 8;
         int xChange = 110;
-        int yChange = Width / 10;
+        double yChange = Width / 10;
         int Health = 3;
         int EnemyFire;
+        int EnemyBulletTimer = 300;
+        int Score;
 
         // Bools 
-        bool EnemyBulletVisibol = false;
-        bool BulletVisibol = false;
+        bool EnemyBulletVisible = false;
+        bool BulletVisible = false;
+        bool EnemyBulletSpawn = true;
+        bool Hit = false;
+        bool GameOver = false;
 
+        // Lists
         List<int> HouseHealth = new List<int>();
+        List<int> ScoreList = new List<int>();
         List<Rectangle> EnemyRectList = new List<Rectangle>();
         List<Rectangle> HouseChangeRectList = new List<Rectangle>();
         List<Texture2D> HouseChangePicList = new List<Texture2D>();
 
         //Rectangle
         Rectangle RectP1 = new Rectangle(Width / 2, Height / 2 + 300, 80, 80);
+        Rectangle BackgroundRect = new Rectangle(0,0, Width, Height);
         Rectangle EnemyBulletRect;
         Rectangle BulletRect;
 
@@ -53,11 +55,14 @@ namespace Space_Invators
         Vector2 BulletPosition;
         Vector2 EnemyBulletSpeed;
         Vector2 EnemyBulletPosition;
+        Vector2 ScorePosition = new Vector2(Width / 2, Height / 2);
+        Vector2 ScoreTextPosition = new Vector2(Width / 2, Height / 2 - 200);
 
         enum GameState
         {
             MainMenu,
             GamePlay,
+            GameOver,
         }
 
         public Game1()
@@ -88,6 +93,8 @@ namespace Space_Invators
             EnemyBulletPic = Content.Load<Texture2D>("SpaceInvaders_EnemyBullet");
             HouseMainPic = Content.Load<Texture2D>("SpaceInvaders_House");
             HouseDamagePic = Content.Load<Texture2D>("SpaceInvaders_House_Damage");
+            arialFont = Content.Load<SpriteFont>("arial");
+            Background = Content.Load<Texture2D>("SpaceInvaders_Background");
 
             // Add Image to House List
             for (int i = 0; i < 3; i++)
@@ -111,8 +118,12 @@ namespace Space_Invators
             // Set position of enenmy with start
             for (int i = 0; i < 10; i++)
             {
-                EnemyRectList.Add(new Rectangle(xChange, yChange, 80, 80));
+                EnemyRectList.Add(new Rectangle(xChange, (int)yChange, 80, 80));
                 xChange += 180;
+            }
+            for (int i = 0; i < 3; i++)
+            {
+                HouseHealth.Add(i);
             }
 
         }
@@ -131,7 +142,10 @@ namespace Space_Invators
                 case GameState.MainMenu:
                     break;
                 case GameState.GamePlay:
-                    GamePlay(gameTime);
+                    GamePlayScene(gameTime);
+                    break;
+                case GameState.GameOver:
+                    GameOverScene();
                     break;
             }
 
@@ -146,7 +160,7 @@ namespace Space_Invators
             base.Draw(gameTime);
         }
 
-        void GamePlay(GameTime gameTime)
+        void GamePlayScene(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.Blue);
             KeyboardState KeyboardState = Keyboard.GetState();
@@ -155,19 +169,20 @@ namespace Space_Invators
             _spriteBatch.Begin();
 
             // Player Draw
+            _spriteBatch.Draw(Background, BackgroundRect, Color.White);
             _spriteBatch.Draw(P1Pic, RectP1, Color.White);
             _spriteBatch.Draw(HouseChangePicList[0], HouseChangeRectList[0], Color.White);
             _spriteBatch.Draw(HouseChangePicList[1], HouseChangeRectList[2], Color.White);
             _spriteBatch.Draw(HouseChangePicList[2], HouseChangeRectList[4], Color.White);
 
             // Draw Bullet
-            if (BulletVisibol == true)
+            if (BulletVisible == true)
             {
                 _spriteBatch.Draw(BulletPic, BulletPosition, Color.White);
             }
 
             // Draw Enemy Bullet
-            if (EnemyBulletVisibol == true)
+            if (EnemyBulletVisible == true)
             {
                 _spriteBatch.Draw(EnemyBulletPic, EnemyBulletPosition, Color.White);
             }
@@ -177,11 +192,16 @@ namespace Space_Invators
             {
                 _spriteBatch.Draw(EnemyPic, rect, Color.White);
             }
-
             _spriteBatch.End();
+
+            if (GameOver == true)
+            {   
+                _state = GameState.GameOver;
+            }
 
             BulletPosition += BulletSpeed;
             EnemyBulletPosition += EnemyBulletSpeed;
+            EnemyBulletTimer--;
 
             MovementPlayer();
             EnemyMovment();
@@ -189,6 +209,17 @@ namespace Space_Invators
             BulletCollision();
 
             base.Draw(gameTime);
+        }
+
+        void GameOverScene()
+        {
+            GraphicsDevice.Clear(Color.Red);
+            _spriteBatch.Begin();
+
+            _spriteBatch.DrawString(arialFont, $"Score", ScoreTextPosition, Color.White);
+            _spriteBatch.DrawString(arialFont, $"{Score}", ScorePosition, Color.White);
+
+            _spriteBatch.End();
         }
 
         void MovementPlayer()
@@ -217,7 +248,7 @@ namespace Space_Invators
 
             if (KeyboardState.IsKeyDown((Keys.Space)) && Hit == false)
             {
-                BulletVisibol = true;
+                BulletVisible = true;
                 BulletPosition.X = RectP1.X + 25;
                 BulletPosition.Y = RectP1.Y;
 
@@ -242,51 +273,54 @@ namespace Space_Invators
                 if (EnemyRectList[i].Intersects(BulletRect) == true)
                 {
                     EnemyRectList.RemoveAt(i);
+                    Hit = false;
                 }
             }
         }
 
         void EnemyBulletCollision()
         {
-
             EnemyBulletRect.Y = (int)EnemyBulletPosition.Y;
             EnemyBulletRect.X = (int)EnemyBulletPosition.X;
 
-            /*DateTime startTid = DateTime.Now;
-            TimeSpan deltaTid = DateTime.Now - startTid;
-            
-
-            if (deltaTid % 10 == 0)
+            if (EnemyBulletTimer == 0 && EnemyBulletSpawn == true)
             {
-               EnemyBulletVisibol = true;
-               EnemyFire = Random.Next(0, 10);
+                EnemyBulletVisible = true;
+                EnemyFire = Random.Next(0, EnemyRectList.Count);
 
-               EnemyBulletSpeed.Y = Random.Next(5, 10);
+                EnemyBulletSpeed.Y = Random.Next(5, 10);
 
-               EnemyBulletPosition.X = rectList[EnemyFire].X;
-               EnemyBulletPosition.Y = rectList[EnemyFire].Y;
-               //make it reset
-            }*/
+                EnemyBulletPosition.X = EnemyRectList[EnemyFire].X;
+                EnemyBulletPosition.Y = EnemyRectList[EnemyFire].Y;
+
+                EnemyBulletTimer = 300;
+
+                if (EnemyRectList.Count == 0)
+                {
+                    EnemyBulletSpawn = false;
+                }
+
+            }
 
             if (EnemyBulletRect.Intersects(RectP1) == true)
             {
                 Health++;
-                EnemyBulletVisibol = false;
+                EnemyBulletVisible = false;
             }
 
-            if (HouseChangeRectList[1].Intersects(EnemyBulletRect) == true)
+            if (HouseChangeRectList[1].Intersects(EnemyBulletRect) == true && HouseHealth[0] != 1)
             {
                 HouseChangePicList[0] = HouseDamagePic;
                 HouseChangeRectList[0] = HouseChangeRectList[1];
                 HouseHealth[0]++;
             }
-            if (HouseChangeRectList[2].Intersects(EnemyBulletRect) == true)
+            if (HouseChangeRectList[2].Intersects(EnemyBulletRect) == true && HouseHealth[1] != 1)
             {
                 HouseChangePicList[1] = HouseDamagePic;
                 HouseChangeRectList[2] = HouseChangeRectList[3];
                 HouseHealth[1]++;
             }
-            if (HouseChangeRectList[3].Intersects(EnemyBulletRect) == true)
+            if (HouseChangeRectList[3].Intersects(EnemyBulletRect) == true && HouseHealth[2] != 1)
             {
                 HouseChangePicList[2] = HouseDamagePic;
                 HouseChangeRectList[4] = HouseChangeRectList[5];
@@ -295,22 +329,32 @@ namespace Space_Invators
 
             if (EnemyBulletPosition.Y < 0)
             {
-                EnemyBulletVisibol = false;
+                EnemyBulletVisible = false;
+            }
+            if (HouseHealth[0] + HouseHealth[1] + HouseHealth[2] == 3)
+            {
+                GameOver = true;
             }
 
         }
 
         void EnemyMovment()
         {
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < 1; i++)
             {
-                for (int j = 0; j < 6; j++)
+                yChange += 0.2;
+                for (int j = 0; j < EnemyRectList.Count; j++)
                 {
                     Rectangle temp = new Rectangle();
                     temp = EnemyRectList[j];
-                    temp.Y = yChange - 50;
+                    temp.Y = (int)yChange;
                     EnemyRectList[j] = temp;
 
+                    // Check if Enemy has past finish line
+                    if (EnemyRectList[i].Intersects(RectP1) == true || temp.Y < -100)
+                    {
+                        GameOver = true;
+                    }
                 }
             }
         }
