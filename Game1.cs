@@ -29,6 +29,7 @@ namespace Space_Invators
         int EnemyFire;
         int EnemyBulletTimer = 300;
         int Score;
+        int HighScore;
 
         // Bools 
         bool EnemyBulletVisible = false;
@@ -55,8 +56,12 @@ namespace Space_Invators
         Vector2 BulletPosition;
         Vector2 EnemyBulletSpeed;
         Vector2 EnemyBulletPosition;
-        Vector2 ScorePosition = new Vector2(Width / 2, Height / 2);
-        Vector2 ScoreTextPosition = new Vector2(Width / 2, Height / 2 - 200);
+
+        // Scorebord
+        Vector2 ScorePosition = new Vector2(Width / 2, Height / 2 - 80);
+        Vector2 ScoreTextPosition = new Vector2(Width / 2 -25, Height / 2 - 120);
+        Vector2 HighScorePosition = new Vector2(Width / 2, Height / 2 +120);
+        Vector2 HighScoreTextPosition = new Vector2(Width / 2 -50, Height / 2 +80);
 
         enum GameState
         {
@@ -195,8 +200,8 @@ namespace Space_Invators
             _spriteBatch.End();
 
             if (GameOver == true)
-            {   
-                _state = GameState.GameOver;
+            {
+                GameOverScene();
             }
 
             BulletPosition += BulletSpeed;
@@ -207,6 +212,7 @@ namespace Space_Invators
             EnemyMovment();
             EnemyBulletCollision();
             BulletCollision();
+            HousePoint();
 
             base.Draw(gameTime);
         }
@@ -216,10 +222,15 @@ namespace Space_Invators
             GraphicsDevice.Clear(Color.Red);
             _spriteBatch.Begin();
 
+            _spriteBatch.Draw(Background, BackgroundRect, Color.White);
             _spriteBatch.DrawString(arialFont, $"Score", ScoreTextPosition, Color.White);
             _spriteBatch.DrawString(arialFont, $"{Score}", ScorePosition, Color.White);
+            _spriteBatch.DrawString(arialFont, $"Highscore", HighScoreTextPosition, Color.White);
+            _spriteBatch.DrawString(arialFont, $"{HighScore}", HighScorePosition, Color.White);
 
             _spriteBatch.End();
+
+            HousePoint();
         }
 
         void MovementPlayer()
@@ -274,6 +285,7 @@ namespace Space_Invators
                 {
                     EnemyRectList.RemoveAt(i);
                     Hit = false;
+                    Score += 50;
                 }
             }
         }
@@ -295,16 +307,18 @@ namespace Space_Invators
 
                 EnemyBulletTimer = 300;
 
+                // Only one time bonus 
                 if (EnemyRectList.Count == 0)
                 {
                     EnemyBulletSpawn = false;
+                    Score += 100;
                 }
 
             }
 
             if (EnemyBulletRect.Intersects(RectP1) == true)
             {
-                Health++;
+                Health--;
                 EnemyBulletVisible = false;
             }
 
@@ -331,11 +345,29 @@ namespace Space_Invators
             {
                 EnemyBulletVisible = false;
             }
+        }
+
+        void HousePoint()
+        {
+
             if (HouseHealth[0] + HouseHealth[1] + HouseHealth[2] == 3)
             {
-                GameOver = true;
+                GameOver = true;     
             }
 
+            if (HouseHealth[0] + HouseHealth[1] + HouseHealth[2] == 0 && GameOver == true)
+            { 
+                Score += 100;
+            }
+
+            for (int i = 0; i < HouseHealth.Count; i++)
+            {
+                if (HouseHealth[i] == 0 && GameOver == true)
+                {
+                    Score += 100;
+                    HouseHealth.RemoveAt(i);
+                }
+            }   
         }
 
         void EnemyMovment()
