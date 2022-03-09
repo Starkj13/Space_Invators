@@ -36,7 +36,9 @@ namespace Space_Invators
         bool BulletVisible = false;
         bool EnemyBulletSpawn = true;
         bool Hit = false;
-        bool GameOver = false;
+        bool GameOver = true;
+        bool EnemyPoint = true;
+        bool Housepoint = true;
 
         // Lists
         List<int> HouseHealth = new List<int>();
@@ -76,7 +78,7 @@ namespace Space_Invators
             _graphics.PreferredBackBufferWidth = Width;
             _graphics.PreferredBackBufferHeight = Height;
             _graphics.ApplyChanges();
-
+           
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
         }
@@ -126,10 +128,12 @@ namespace Space_Invators
                 EnemyRectList.Add(new Rectangle(xChange, (int)yChange, 80, 80));
                 xChange += 180;
             }
+
             for (int i = 0; i < 3; i++)
             {
-                HouseHealth.Add(i);
+                HouseHealth.Add(0);
             }
+
 
         }
 
@@ -198,6 +202,7 @@ namespace Space_Invators
                 _spriteBatch.Draw(EnemyPic, rect, Color.White);
             }
             _spriteBatch.End();
+    
 
             if (GameOver == true)
             {
@@ -279,6 +284,7 @@ namespace Space_Invators
             BulletRect.Y = (int)BulletPosition.Y;
             BulletRect.X = (int)BulletPosition.X;
 
+            // Enemy hit by bullet
             for (int i = 0; i < EnemyRectList.Count; i++)
             {
                 if (EnemyRectList[i].Intersects(BulletRect) == true)
@@ -286,8 +292,23 @@ namespace Space_Invators
                     EnemyRectList.RemoveAt(i);
                     Hit = false;
                     Score += 50;
+                    BulletVisible = false;
                 }
             }
+
+            // If bullet pass enemy line make invisibal
+            for (int i = 0; i < EnemyRectList.Count; i++)
+            {
+                Rectangle temp = new Rectangle();
+                temp = EnemyRectList[i];
+
+                if (BulletRect.Y < temp.Y)
+                {
+                    BulletVisible = false;
+                    Hit = false;
+                }
+            }
+
         }
 
         void EnemyBulletCollision()
@@ -308,9 +329,10 @@ namespace Space_Invators
                 EnemyBulletTimer = 300;
 
                 // Only one time bonus 
-                if (EnemyRectList.Count == 0)
+                if (EnemyRectList.Count == 0 && EnemyPoint == true)
                 {
                     EnemyBulletSpawn = false;
+                    EnemyPoint = false;
                     Score += 100;
                 }
 
@@ -350,14 +372,15 @@ namespace Space_Invators
         void HousePoint()
         {
 
-            if (HouseHealth[0] + HouseHealth[1] + HouseHealth[2] == 3)
+            if ((HouseHealth[0] + HouseHealth[1] + HouseHealth[2]) == 3)
             {
                 GameOver = true;     
             }
-
-            if (HouseHealth[0] + HouseHealth[1] + HouseHealth[2] == 0 && GameOver == true)
+           
+            if (HouseHealth[0] + HouseHealth[1] + HouseHealth[2] == 0 && GameOver == true && Housepoint == true)
             { 
                 Score += 100;
+                Housepoint = false;
             }
 
             for (int i = 0; i < HouseHealth.Count; i++)
@@ -367,7 +390,7 @@ namespace Space_Invators
                     Score += 100;
                     HouseHealth.RemoveAt(i);
                 }
-            }   
+            }
         }
 
         void EnemyMovment()
