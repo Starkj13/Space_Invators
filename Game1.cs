@@ -27,6 +27,7 @@ namespace Space_Invators
         double yChange = Width / 10;
         int Health = 3;
         int EnemyFire;
+        int HouseHit = 3;
         int EnemyBulletTimer = 300;
         int Score;
         int HighScore;
@@ -36,7 +37,7 @@ namespace Space_Invators
         bool BulletVisible = false;
         bool EnemyBulletSpawn = true;
         bool Hit = false;
-        bool GameOver = true;
+        bool GameOver = false;
         bool EnemyPoint = true;
         bool Housepoint = true;
 
@@ -242,6 +243,7 @@ namespace Space_Invators
         {
             KeyboardState KeyboardState = Keyboard.GetState();
 
+            // Move Player with Keyboard
             if (KeyboardState.IsKeyDown(Keys.A))
             {
                 RectP1.X -= MovmentSpeed;
@@ -251,7 +253,7 @@ namespace Space_Invators
                 RectP1.X += MovmentSpeed;
             }
 
-
+            // Not out of screen
             if (RectP1.X > Width - 85)
             {
                 RectP1.X -= MovmentSpeed;
@@ -261,7 +263,7 @@ namespace Space_Invators
                 RectP1.X += MovmentSpeed;
             }
 
-
+            // Bullet Fire
             if (KeyboardState.IsKeyDown((Keys.Space)) && Hit == false)
             {
                 BulletVisible = true;
@@ -272,6 +274,7 @@ namespace Space_Invators
                 Hit = true;
             }
 
+            // Set bullet hit to false if it out of screen
             if (BulletPosition.Y < -Height / 2)
             {
                 Hit = false;
@@ -316,15 +319,13 @@ namespace Space_Invators
             EnemyBulletRect.Y = (int)EnemyBulletPosition.Y;
             EnemyBulletRect.X = (int)EnemyBulletPosition.X;
 
+            // EnemyBullet Spawner
             if (EnemyBulletTimer == 0 && EnemyBulletSpawn == true)
             {
                 EnemyBulletVisible = true;
+                
                 EnemyFire = Random.Next(0, EnemyRectList.Count);
-
                 EnemyBulletSpeed.Y = Random.Next(5, 10);
-
-                EnemyBulletPosition.X = EnemyRectList[EnemyFire].X;
-                EnemyBulletPosition.Y = EnemyRectList[EnemyFire].Y;
 
                 EnemyBulletTimer = 300;
 
@@ -336,14 +337,22 @@ namespace Space_Invators
                     Score += 100;
                 }
 
+                if (EnemyBulletSpawn == true)
+                {
+                    EnemyBulletPosition.X = EnemyRectList[EnemyFire].X;
+                    EnemyBulletPosition.Y = EnemyRectList[EnemyFire].Y;
+                }
+
             }
 
+            // EnemyBullet hit player check
             if (EnemyBulletRect.Intersects(RectP1) == true)
             {
                 Health--;
                 EnemyBulletVisible = false;
             }
 
+            // EnemyBullet hit Houses check
             if (HouseChangeRectList[1].Intersects(EnemyBulletRect) == true && HouseHealth[0] != 1)
             {
                 HouseChangePicList[0] = HouseDamagePic;
@@ -363,6 +372,7 @@ namespace Space_Invators
                 HouseHealth[2]++;
             }
 
+            // Change EnemyBullet Visible
             if (EnemyBulletPosition.Y < 0)
             {
                 EnemyBulletVisible = false;
@@ -372,29 +382,35 @@ namespace Space_Invators
         void HousePoint()
         {
 
+            // Check Game Over 
             if ((HouseHealth[0] + HouseHealth[1] + HouseHealth[2]) == 3)
             {
                 GameOver = true;     
             }
            
+            // Check House life and give point
             if (HouseHealth[0] + HouseHealth[1] + HouseHealth[2] == 0 && GameOver == true && Housepoint == true)
             { 
                 Score += 100;
                 Housepoint = false;
             }
 
-            for (int i = 0; i < HouseHealth.Count; i++)
+            // Point Set for every house survived
+            for (int i = 0; HouseHit != 0 && HouseHit < 0; i++)
             {
                 if (HouseHealth[i] == 0 && GameOver == true)
                 {
                     Score += 100;
-                    HouseHealth.RemoveAt(i);
+                    HouseHealth[i] = 0;
+                    --HouseHit;
                 }
             }
         }
 
         void EnemyMovment()
         {
+
+            // Loop for moving the enemys
             for (int i = 0; i < 1; i++)
             {
                 yChange += 0.2;
