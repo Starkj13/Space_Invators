@@ -2,6 +2,8 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
+using System.IO;
+using System.Diagnostics;
 using System.Collections.Generic;
 
 namespace Space_Invators
@@ -134,7 +136,7 @@ namespace Space_Invators
             {
                 HouseHealth.Add(0);
             }
-
+            FileManager();
 
         }
 
@@ -244,21 +246,11 @@ namespace Space_Invators
             KeyboardState KeyboardState = Keyboard.GetState();
 
             // Move Player with Keyboard
-            if (KeyboardState.IsKeyDown(Keys.A))
+            if (KeyboardState.IsKeyDown(Keys.A) && RectP1.X !> 0)
             {
                 RectP1.X -= MovmentSpeed;
             }
-            if (KeyboardState.IsKeyDown(Keys.D))
-            {
-                RectP1.X += MovmentSpeed;
-            }
-
-            // Not out of screen
-            if (RectP1.X > Width - 85)
-            {
-                RectP1.X -= MovmentSpeed;
-            }
-            if (RectP1.X < 0)
+            if (KeyboardState.IsKeyDown(Keys.D) && RectP1.X !< Width -85)
             {
                 RectP1.X += MovmentSpeed;
             }
@@ -428,6 +420,19 @@ namespace Space_Invators
                     }
                 }
             }
+        }
+
+        void FileManager()
+        {
+               
+            if (File.Exists("HighScore.txt")==false)
+            {
+                File.WriteAllText("HighScore.txt", $"{HighScore}");
+                Debug.WriteLine("test");
+            }
+            string HighScoreContent = File.ReadAllText("HighScore.txt");
+            HighScore = int.Parse(HighScoreContent);
+
         }
     }
 }
