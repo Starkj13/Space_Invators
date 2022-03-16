@@ -51,7 +51,7 @@ namespace Space_Invators
         List<Texture2D> HouseChangePicList = new List<Texture2D>();
 
         //Rectangle
-        Rectangle RectP1 = new Rectangle(Width / 2, Height / 2 + 300, 80, 80);
+        Rectangle RectP1 = new Rectangle(Width / 2, Height / 2 + 300, 120, 120);
         Rectangle BackgroundRect = new Rectangle(0,0, Width, Height);
         Rectangle EnemyBulletRect;
         Rectangle BulletRect;
@@ -97,8 +97,8 @@ namespace Space_Invators
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            P1Pic = Content.Load<Texture2D>("parrot");
-            BulletPic = Content.Load<Texture2D>("ball");
+            P1Pic = Content.Load<Texture2D>("SpaceShip");
+            BulletPic = Content.Load<Texture2D>("Bullet");
             EnemyPic = Content.Load<Texture2D>("LargeAlien");
             EnemyBulletPic = Content.Load<Texture2D>("SpaceInvaders_EnemyBullet");
             HouseMainPic = Content.Load<Texture2D>("SpaceInvaders_House");
@@ -238,6 +238,12 @@ namespace Space_Invators
 
             _spriteBatch.End();
 
+            // Sets a new Highscore if Score is higher
+            if (Score > HighScore)
+            {
+                HighScore = Score;
+            }
+
             HousePoint();
         }
 
@@ -259,7 +265,7 @@ namespace Space_Invators
             if (KeyboardState.IsKeyDown((Keys.Space)) && Hit == false)
             {
                 BulletVisible = true;
-                BulletPosition.X = RectP1.X + 25;
+                BulletPosition.X = RectP1.X + 50;
                 BulletPosition.Y = RectP1.Y;
 
                 BulletSpeed.Y = Random.Next(-10, -5);
@@ -270,6 +276,11 @@ namespace Space_Invators
             if (BulletPosition.Y < -Height / 2)
             {
                 Hit = false;
+            }
+
+            if (Health == 0)
+            {
+                GameOver = true;
             }
 
         }
