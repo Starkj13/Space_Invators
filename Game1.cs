@@ -39,19 +39,20 @@ namespace Space_Invators
         bool BulletVisible = false;
         bool EnemyBulletSpawn = true;
         bool Hit = false;
-        bool GameOver = false;
+        bool LastScen = false;
+        bool GameOverScene = false;
+        bool WinningScene = false;
         bool EnemyPoint = true;
         bool Housepoint = true;
 
         // Lists
         List<int> HouseHealth = new List<int>();
-        List<int> ScoreList = new List<int>();
         List<Rectangle> EnemyRectList = new List<Rectangle>();
         List<Rectangle> HouseChangeRectList = new List<Rectangle>();
         List<Texture2D> HouseChangePicList = new List<Texture2D>();
 
         //Rectangle
-        Rectangle RectP1 = new Rectangle(Width / 2, Height / 2 + 300, 120, 120);
+        Rectangle RectP1 = new Rectangle(Width / 2, Height / 2 + 500, 120, 120);
         Rectangle BackgroundRect = new Rectangle(0,0, Width, Height);
         Rectangle EnemyBulletRect;
         Rectangle BulletRect;
@@ -67,12 +68,13 @@ namespace Space_Invators
         Vector2 ScoreTextPosition = new Vector2(Width / 2 -25, Height / 2 - 120);
         Vector2 HighScorePosition = new Vector2(Width / 2, Height / 2 +120);
         Vector2 HighScoreTextPosition = new Vector2(Width / 2 -50, Height / 2 +80);
+        Vector2 SceneText = new Vector2(Width / 2 - 50, Height / 2 - 600);
 
         enum GameState
         {
             MainMenu,
             GamePlay,
-            GameOver,
+            LastScene,
         }
 
         public Game1()
@@ -98,9 +100,9 @@ namespace Space_Invators
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
             P1Pic = Content.Load<Texture2D>("SpaceShip");
-            BulletPic = Content.Load<Texture2D>("Bullet");
+            BulletPic = Content.Load<Texture2D>("P1Bullet");
             EnemyPic = Content.Load<Texture2D>("LargeAlien");
-            EnemyBulletPic = Content.Load<Texture2D>("SpaceInvaders_EnemyBullet");
+            EnemyBulletPic = Content.Load<Texture2D>("EnemyBullet");
             HouseMainPic = Content.Load<Texture2D>("SpaceInvaders_House");
             HouseDamagePic = Content.Load<Texture2D>("SpaceInvaders_House_Damage");
             arialFont = Content.Load<SpriteFont>("arial");
@@ -114,16 +116,22 @@ namespace Space_Invators
 
             // Add House Rects to list
             // House 1
-            HouseChangeRectList.Add(new Rectangle(Width / 4, Height / 2 + 400, 500, 500));
-            HouseChangeRectList.Add(new Rectangle(Width / 4, Height / 2 + 300, 500, 500));
 
-            // House 2
-            HouseChangeRectList.Add(new Rectangle(Width / 2 + 100, Height / 2 + 400, 500, 500));
-            HouseChangeRectList.Add(new Rectangle(Width / 2 + 100, Height / 2 + 300, 500, 500));
+            for (int i = 0; i < 6; i++)
+            {
+                HouseChangeRectList.Add(new Rectangle(Width / i, Height / i + 200, 500, 500));
+            }
 
-            // House 3
-            HouseChangeRectList.Add(new Rectangle(Width / 2, Height / 2 + 400, 500, 500));
-            HouseChangeRectList.Add(new Rectangle(Width / 2, Height / 2 + 300, 500, 500));
+            //HouseChangeRectList.Add(new Rectangle(Width / 7, Height / 2 + 200, 500, 500));
+            //HouseChangeRectList.Add(new Rectangle(Width / 7, Height / 2 + 100, 500, 500));
+
+            //// House 2
+            //HouseChangeRectList.Add(new Rectangle(Width / 3 + 50, Height / 2 + 200, 500, 500));
+            //HouseChangeRectList.Add(new Rectangle(Width / 3 + 50, Height / 2 + 100, 500, 500));
+
+            //// House 3
+            //HouseChangeRectList.Add(new Rectangle(Width / 2 + 100, Height / 2 + 200, 500, 500));
+            //HouseChangeRectList.Add(new Rectangle(Width / 2 + 100, Height / 2 + 100, 500, 500));
 
             // Set position of enenmy with start
             for (int i = 0; i < 10; i++)
@@ -156,8 +164,8 @@ namespace Space_Invators
                 case GameState.GamePlay:
                     GamePlayScene(gameTime);
                     break;
-                case GameState.GameOver:
-                    GameOverScene();
+                case GameState.LastScene:
+                    LastScene();
                     break;
             }
 
@@ -207,9 +215,9 @@ namespace Space_Invators
             _spriteBatch.End();
     
 
-            if (GameOver == true)
+            if (LastScen == true)
             {
-                GameOverScene();
+                LastScene();
             }
 
             BulletPosition += BulletSpeed;
@@ -225,23 +233,34 @@ namespace Space_Invators
             base.Draw(gameTime);
         }
 
-        void GameOverScene()
+        void LastScene()
         {
             GraphicsDevice.Clear(Color.Red);
-            _spriteBatch.Begin();
-
-            _spriteBatch.Draw(Background, BackgroundRect, Color.White);
-            _spriteBatch.DrawString(arialFont, $"Score", ScoreTextPosition, Color.White);
-            _spriteBatch.DrawString(arialFont, $"{Score}", ScorePosition, Color.White);
-            _spriteBatch.DrawString(arialFont, $"Highscore", HighScoreTextPosition, Color.White);
-            _spriteBatch.DrawString(arialFont, $"{HighScore}", HighScorePosition, Color.White);
-
-            _spriteBatch.End();
-
-            // Sets a new Highscore if Score is higher
-            if (Score > HighScore)
+            if (GameOverScene)
             {
-                HighScore = Score;
+                _spriteBatch.Begin();
+
+                _spriteBatch.Draw(Background, BackgroundRect, Color.White);
+                _spriteBatch.DrawString(arialFont, $"Game Over", SceneText, Color.White);
+                _spriteBatch.DrawString(arialFont, $"Score", ScoreTextPosition, Color.White);
+                _spriteBatch.DrawString(arialFont, $"{Score}", ScorePosition, Color.White);
+                _spriteBatch.DrawString(arialFont, $"Highscore", HighScoreTextPosition, Color.White);
+                _spriteBatch.DrawString(arialFont, $"{HighScore}", HighScorePosition, Color.White);
+
+                _spriteBatch.End();
+            }
+            if (WinningScene)
+            {
+                _spriteBatch.Begin();
+
+                _spriteBatch.Draw(Background, BackgroundRect, Color.White);
+                _spriteBatch.DrawString(arialFont, $"Winner", SceneText, Color.White);
+                _spriteBatch.DrawString(arialFont, $"Score", ScoreTextPosition, Color.White);
+                _spriteBatch.DrawString(arialFont, $"{Score}", ScorePosition, Color.White);
+                _spriteBatch.DrawString(arialFont, $"Highscore", HighScoreTextPosition, Color.White);
+                _spriteBatch.DrawString(arialFont, $"{HighScore}", HighScorePosition, Color.White);
+
+                _spriteBatch.End();
             }
 
             HousePoint();
@@ -280,7 +299,8 @@ namespace Space_Invators
 
             if (Health == 0)
             {
-                GameOver = true;
+                LastScen = true;
+                GameOverScene = true;
             }
 
         }
@@ -340,6 +360,12 @@ namespace Space_Invators
                     Score += 100;
                 }
 
+                if (EnemyRectList.Count == 0)
+                {
+                    LastScen = true;
+                    WinningScene = true;
+                }
+
                 if (EnemyBulletSpawn == true)
                 {
                     EnemyBulletPosition.X = EnemyRectList[EnemyFire].X;
@@ -388,11 +414,12 @@ namespace Space_Invators
             // Check Game Over 
             if ((HouseHealth[0] + HouseHealth[1] + HouseHealth[2]) == 3)
             {
-                GameOver = true;     
+                LastScen = true;
+                GameOverScene = true;
             }
            
             // Check House life and give point
-            if (HouseHealth[0] + HouseHealth[1] + HouseHealth[2] == 0 && GameOver == true && Housepoint == true)
+            if (HouseHealth[0] + HouseHealth[1] + HouseHealth[2] == 0 && LastScen == true && Housepoint == true)
             { 
                 Score += 100;
                 Housepoint = false;
@@ -401,7 +428,7 @@ namespace Space_Invators
             // Point Set for every house survived
             for (int i = 0; HouseHit != 0 && HouseHit < 0; i++)
             {
-                if (HouseHealth[i] == 0 && GameOver == true)
+                if (HouseHealth[i] == 0 && LastScen == true)
                 {
                     Score += 100;
                     HouseHealth[i] = 0;
@@ -427,7 +454,8 @@ namespace Space_Invators
                     // Check if Enemy has past finish line
                     if (EnemyRectList[i].Intersects(RectP1) == true || temp.Y < -100)
                     {
-                        GameOver = true;
+                        LastScen = true;
+                        GameOverScene = true;
                     }
                 }
             }
@@ -435,14 +463,23 @@ namespace Space_Invators
 
         void FileManager()
         {
-               
+            // Create a text file
             if (File.Exists("HighScore.txt")==false)
             {
-                File.WriteAllText("HighScore.txt", $"{HighScore}");
-                Debug.WriteLine("test");
+                 File.WriteAllText("HighScore.txt", $"{HighScore}");
             }
+
+            // Read text file 
             string HighScoreContent = File.ReadAllText("HighScore.txt");
             HighScore = int.Parse(HighScoreContent);
+
+            // Sets a new Highscore if Score is higher
+            if (Score > HighScore)
+            {
+                HighScore = Score;
+
+                File.WriteAllText("HighScore.txt", $"{HighScore}");
+            }
 
         }
     }
