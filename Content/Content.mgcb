@@ -20,6 +20,12 @@
 /processorParam:TextureFormat=Compressed
 /build:arial.spritefont
 
+#begin Ememykilled.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Ememykilled.wav
+
 #begin EnemyBullet.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -55,6 +61,12 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:P1Bullet.png
+
+#begin shoot.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:shoot.wav
 
 #begin SpaceInvaders.png
 /importer:TextureImporter
@@ -103,6 +115,12 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:SpaceInvaders_House_Damage.png
+
+#begin spaceinvadersmusic.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:spaceinvadersmusic.mp3
 
 #begin SpaceShip.png
 /importer:TextureImporter

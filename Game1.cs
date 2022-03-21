@@ -1,6 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Media;
+using Microsoft.Xna.Framework.Audio;
 using System;
 using System.IO;
 using System.Diagnostics;
@@ -16,6 +18,9 @@ namespace Space_Invators
         MouseState mouse;
         SpriteFont arialFont;
         Texture2D P1Pic, BulletPic, EnemyPic, HouseMainPic, HouseDamagePic, EnemyBulletPic, Background;
+        Song Music;
+        SoundEffect Shoot;
+        SoundEffect EnemyKilled;
 
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
@@ -32,7 +37,7 @@ namespace Space_Invators
         int HouseHit = 3;
         int EnemyBulletTimer = 300;
         int Score;
-        int HighScore;
+        int HighScore = 0;
 
         // Bools 
         bool EnemyBulletVisible = false;
@@ -99,6 +104,14 @@ namespace Space_Invators
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
+            // Load Sound 
+            Music = Content.Load<Song>("spaceinvadersmusic");
+            EnemyKilled = Content.Load<SoundEffect>("Ememykilled");
+            Shoot = Content.Load<SoundEffect>("shoot");
+            // Play Music
+            MediaPlayer.IsRepeating = true;
+            MediaPlayer.Play(Music);
+
             P1Pic = Content.Load<Texture2D>("SpaceShip");
             BulletPic = Content.Load<Texture2D>("P1Bullet");
             EnemyPic = Content.Load<Texture2D>("LargeAlien");
@@ -116,22 +129,16 @@ namespace Space_Invators
 
             // Add House Rects to list
             // House 1
+            HouseChangeRectList.Add(new Rectangle(Width / 7, Height / 2 + 200, 500, 500));
+            HouseChangeRectList.Add(new Rectangle(Width / 7, Height / 2 + 100, 500, 500));
 
-            for (int i = 0; i < 6; i++)
-            {
-                HouseChangeRectList.Add(new Rectangle(Width / i, Height / i + 200, 500, 500));
-            }
+            // House 2
+            HouseChangeRectList.Add(new Rectangle(Width / 3 + 50, Height / 2 + 200, 500, 500));
+            HouseChangeRectList.Add(new Rectangle(Width / 3 + 50, Height / 2 + 100, 500, 500));
 
-            //HouseChangeRectList.Add(new Rectangle(Width / 7, Height / 2 + 200, 500, 500));
-            //HouseChangeRectList.Add(new Rectangle(Width / 7, Height / 2 + 100, 500, 500));
-
-            //// House 2
-            //HouseChangeRectList.Add(new Rectangle(Width / 3 + 50, Height / 2 + 200, 500, 500));
-            //HouseChangeRectList.Add(new Rectangle(Width / 3 + 50, Height / 2 + 100, 500, 500));
-
-            //// House 3
-            //HouseChangeRectList.Add(new Rectangle(Width / 2 + 100, Height / 2 + 200, 500, 500));
-            //HouseChangeRectList.Add(new Rectangle(Width / 2 + 100, Height / 2 + 100, 500, 500));
+            // House 3
+            HouseChangeRectList.Add(new Rectangle(Width / 2 + 100, Height / 2 + 200, 500, 500));
+            HouseChangeRectList.Add(new Rectangle(Width / 2 + 100, Height / 2 + 100, 500, 500));
 
             // Set position of enenmy with start
             for (int i = 0; i < 10; i++)
@@ -264,6 +271,7 @@ namespace Space_Invators
             }
 
             HousePoint();
+            FileManager();
         }
 
         void MovementPlayer()
@@ -286,7 +294,7 @@ namespace Space_Invators
                 BulletVisible = true;
                 BulletPosition.X = RectP1.X + 50;
                 BulletPosition.Y = RectP1.Y;
-
+                Shoot.Play();
                 BulletSpeed.Y = Random.Next(-10, -5);
                 Hit = true;
             }
@@ -316,6 +324,7 @@ namespace Space_Invators
                 if (EnemyRectList[i].Intersects(BulletRect) == true)
                 {
                     EnemyRectList.RemoveAt(i);
+                    EnemyKilled.Play();
                     Hit = false;
                     Score += 50;
                     BulletVisible = false;
@@ -463,11 +472,6 @@ namespace Space_Invators
 
         void FileManager()
         {
-            // Create a text file
-            if (File.Exists("HighScore.txt")==false)
-            {
-                 File.WriteAllText("HighScore.txt", $"{HighScore}");
-            }
 
             // Read text file 
             string HighScoreContent = File.ReadAllText("HighScore.txt");
@@ -478,7 +482,10 @@ namespace Space_Invators
             {
                 HighScore = Score;
 
-                File.WriteAllText("HighScore.txt", $"{HighScore}");
+                StreamWriter writer = new StreamWriter(@"C:../../../HighScore.txt");
+                writer.WriteLine(HighScore);
+                writer.Dispose();
+
             }
 
         }
