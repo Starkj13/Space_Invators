@@ -30,7 +30,7 @@ namespace Space_Invators
 
         // Ints
         int MovmentSpeed = 8;
-        int xChange = 110;
+        int xChange = 80;
         double yChange = Width / 10;
         int Health = 3;
         int EnemyFire;
@@ -129,22 +129,20 @@ namespace Space_Invators
 
             // Add House Rects to list
             // House 1
-            HouseChangeRectList.Add(new Rectangle(Width / 7, Height / 2 + 200, 500, 500));
-            HouseChangeRectList.Add(new Rectangle(Width / 7, Height / 2 + 100, 500, 500));
-
+            HouseChangeRectList.Add(new Rectangle(Width / 4, Height / 2 + 200, 200, 200));
+           
             // House 2
-            HouseChangeRectList.Add(new Rectangle(Width / 3 + 50, Height / 2 + 200, 500, 500));
-            HouseChangeRectList.Add(new Rectangle(Width / 3 + 50, Height / 2 + 100, 500, 500));
-
+            HouseChangeRectList.Add(new Rectangle(Width / 3 + 180, Height / 2 + 200, 200, 200));
+            
             // House 3
-            HouseChangeRectList.Add(new Rectangle(Width / 2 + 100, Height / 2 + 200, 500, 500));
-            HouseChangeRectList.Add(new Rectangle(Width / 2 + 100, Height / 2 + 100, 500, 500));
+            HouseChangeRectList.Add(new Rectangle(Width / 2 + 220, Height / 2 + 200, 200 ,200));
+            
 
             // Set position of enenmy with start
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < 11; i++)
             {
                 EnemyRectList.Add(new Rectangle(xChange, (int)yChange, 80, 80));
-                xChange += 180;
+                xChange += 170;
             }
 
             for (int i = 0; i < 3; i++)
@@ -199,8 +197,8 @@ namespace Space_Invators
             _spriteBatch.Draw(Background, BackgroundRect, Color.White);
             _spriteBatch.Draw(P1Pic, RectP1, Color.White);
             _spriteBatch.Draw(HouseChangePicList[0], HouseChangeRectList[0], Color.White);
-            _spriteBatch.Draw(HouseChangePicList[1], HouseChangeRectList[2], Color.White);
-            _spriteBatch.Draw(HouseChangePicList[2], HouseChangeRectList[4], Color.White);
+            _spriteBatch.Draw(HouseChangePicList[1], HouseChangeRectList[1], Color.White);
+            _spriteBatch.Draw(HouseChangePicList[2], HouseChangeRectList[2], Color.White);
 
             // Draw Bullet
             if (BulletVisible == true)
@@ -390,31 +388,15 @@ namespace Space_Invators
                 EnemyBulletVisible = false;
             }
 
-            // EnemyBullet hit Houses check
-            if (HouseChangeRectList[1].Intersects(EnemyBulletRect) == true && HouseHealth[0] != 1)
+            for (int i = 0; i < 3; i++)
             {
-                HouseChangePicList[0] = HouseDamagePic;
-                HouseChangeRectList[0] = HouseChangeRectList[1];
-                HouseHealth[0]++;
-            }
-            if (HouseChangeRectList[2].Intersects(EnemyBulletRect) == true && HouseHealth[1] != 1)
-            {
-                HouseChangePicList[1] = HouseDamagePic;
-                HouseChangeRectList[2] = HouseChangeRectList[3];
-                HouseHealth[1]++;
-            }
-            if (HouseChangeRectList[3].Intersects(EnemyBulletRect) == true && HouseHealth[2] != 1)
-            {
-                HouseChangePicList[2] = HouseDamagePic;
-                HouseChangeRectList[4] = HouseChangeRectList[5];
-                HouseHealth[2]++;
-            }
-
-            // Change EnemyBullet Visible
-            if (EnemyBulletPosition.Y < 0)
-            {
-                EnemyBulletVisible = false;
-            }
+                // EnemyBullet hit Houses check
+                if (HouseChangeRectList[i].Intersects(EnemyBulletRect) == true && HouseHealth[i] != 1)
+                {    
+                    HouseChangePicList[i] = HouseDamagePic;
+                    HouseHealth[i]++;
+                }
+            }   
         }
 
         void HousePoint()
@@ -461,7 +443,7 @@ namespace Space_Invators
                     EnemyRectList[j] = temp;
 
                     // Check if Enemy has past finish line
-                    if (EnemyRectList[i].Intersects(RectP1) == true || temp.Y < -100)
+                    if (EnemyRectList[i].Intersects(RectP1) == true || temp.Y < -Height / 2 + 200)
                     {
                         LastScen = true;
                         GameOverScene = true;
