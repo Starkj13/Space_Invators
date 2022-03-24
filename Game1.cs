@@ -17,7 +17,7 @@ namespace Space_Invators
         GameState _state;
         MouseState mouse;
         SpriteFont arialFont;
-        Texture2D P1Pic, BulletPic, EnemyPic, HouseMainPic, HouseDamagePic, EnemyBulletPic, Background;
+        Texture2D P1Pic, BulletPic, EnemyPic, HouseMainPic, HouseDamagePic, EnemyBulletPic, Background, ButtonPic;
         Song Music;
         SoundEffect Shoot;
         SoundEffect EnemyKilled;
@@ -32,7 +32,6 @@ namespace Space_Invators
         int MovmentSpeed = 8;
         int xChange = 80;
         double yChange = Width / 10;
-        int Health = 3;
         int EnemyFire;
         int HouseHit = 3;
         int EnemyBulletTimer = 300;
@@ -59,6 +58,7 @@ namespace Space_Invators
         //Rectangle
         Rectangle RectP1 = new Rectangle(Width / 2, Height / 2 + 500, 120, 120);
         Rectangle BackgroundRect = new Rectangle(0,0, Width, Height);
+        Rectangle ButtonRect = new Rectangle(Width / 2 - 50, Height / 2, 200, 100);
         Rectangle EnemyBulletRect;
         Rectangle BulletRect;
 
@@ -120,6 +120,7 @@ namespace Space_Invators
             HouseDamagePic = Content.Load<Texture2D>("SpaceInvaders_House_Damage");
             arialFont = Content.Load<SpriteFont>("arial");
             Background = Content.Load<Texture2D>("SpaceInvaders_Background");
+            ButtonPic = Content.Load<Texture2D>("Start_Button");
 
             // Add Image to House List
             for (int i = 0; i < 3; i++)
@@ -160,11 +161,12 @@ namespace Space_Invators
                 Exit();
 
 
-            _state = GameState.GamePlay;
+            _state = GameState.MainMenu;
 
             switch (_state)
             {
                 case GameState.MainMenu:
+                    MainMenu(gameTime);
                     break;
                 case GameState.GamePlay:
                     GamePlayScene(gameTime);
@@ -185,12 +187,32 @@ namespace Space_Invators
             base.Draw(gameTime);
         }
 
+        void MainMenu(GameTime gameTime)
+        {
+            mouse = Mouse.GetState();
+            IsMouseVisible = true;
+            _spriteBatch.Begin();
+
+            // Player Draw
+            _spriteBatch.Draw(Background, BackgroundRect, Color.White);
+            _spriteBatch.DrawString(arialFont, $"Main Menu", ScoreTextPosition, Color.White);
+            _spriteBatch.Draw(ButtonPic, ButtonRect, Color.White);
+            _spriteBatch.End();
+
+            if (mouse.LeftButton == ButtonState.Pressed == true && ButtonRect.Contains(mouse.Position) == true)
+            {
+                Debug.WriteLine("hamms");
+                _state = GameState.GamePlay;
+                Update(gameTime);                
+            }
+            base.Draw(gameTime);
+        }
+
         void GamePlayScene(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.Blue);
             KeyboardState KeyboardState = Keyboard.GetState();
             mouse = Mouse.GetState();
-
+            IsMouseVisible = false;
             _spriteBatch.Begin();
 
             // Player Draw
@@ -222,6 +244,7 @@ namespace Space_Invators
 
             if (LastScen == true)
             {
+                _state = GameState.LastScene;
                 LastScene();
             }
 
@@ -302,13 +325,6 @@ namespace Space_Invators
             {
                 Hit = false;
             }
-
-            if (Health == 0)
-            {
-                LastScen = true;
-                GameOverScene = true;
-            }
-
         }
 
         void BulletCollision()
@@ -384,7 +400,8 @@ namespace Space_Invators
             // EnemyBullet hit player check
             if (EnemyBulletRect.Intersects(RectP1) == true)
             {
-                Health--;
+                LastScen = true;
+                GameOverScene = true;
                 EnemyBulletVisible = false;
             }
 
@@ -443,7 +460,7 @@ namespace Space_Invators
                     EnemyRectList[j] = temp;
 
                     // Check if Enemy has past finish line
-                    if (EnemyRectList[i].Intersects(RectP1) == true || temp.Y < -Height / 2 + 200)
+                    if (EnemyRectList[i].Intersects(RectP1) == true || temp.Y > Height / 2 + 200)
                     {
                         LastScen = true;
                         GameOverScene = true;
