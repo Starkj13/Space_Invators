@@ -58,7 +58,7 @@ namespace Space_Invators
         //Rectangle
         Rectangle RectP1 = new Rectangle(Width / 2, Height / 2 + 500, 120, 120);
         Rectangle BackgroundRect = new Rectangle(0,0, Width, Height);
-        Rectangle ButtonRect = new Rectangle(Width / 2 - 50, Height / 2, 200, 100);
+        Rectangle ButtonRect = new Rectangle(Width / 2 - 100, Height / 2, 200, 100);
         Rectangle EnemyBulletRect;
         Rectangle BulletRect;
 
@@ -103,6 +103,7 @@ namespace Space_Invators
         protected override void LoadContent()
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
+            _state = GameState.MainMenu;
 
             // Load Sound 
             Music = Content.Load<Song>("spaceinvadersmusic");
@@ -110,7 +111,7 @@ namespace Space_Invators
             Shoot = Content.Load<SoundEffect>("shoot");
             // Play Music
             MediaPlayer.IsRepeating = true;
-            MediaPlayer.Play(Music);
+            //MediaPlayer.Play(Music);
 
             P1Pic = Content.Load<Texture2D>("SpaceShip");
             BulletPic = Content.Load<Texture2D>("P1Bullet");
@@ -160,9 +161,6 @@ namespace Space_Invators
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-
-            _state = GameState.MainMenu;
-
             switch (_state)
             {
                 case GameState.MainMenu:
@@ -191,20 +189,20 @@ namespace Space_Invators
         {
             mouse = Mouse.GetState();
             IsMouseVisible = true;
-            _spriteBatch.Begin();
+            
+            if (ButtonRect.Contains(mouse.Position) == true && mouse.LeftButton == ButtonState.Pressed)
+            {  
+                _state = GameState.GamePlay;        
+            }
 
-            // Player Draw
+            _spriteBatch.Begin();
+            // Button Draw
             _spriteBatch.Draw(Background, BackgroundRect, Color.White);
             _spriteBatch.DrawString(arialFont, $"Main Menu", ScoreTextPosition, Color.White);
             _spriteBatch.Draw(ButtonPic, ButtonRect, Color.White);
             _spriteBatch.End();
 
-            if (mouse.LeftButton == ButtonState.Pressed == true && ButtonRect.Contains(mouse.Position) == true)
-            {
-                Debug.WriteLine("hamms");
-                _state = GameState.GamePlay;
-                Update(gameTime);                
-            }
+
             base.Draw(gameTime);
         }
 
