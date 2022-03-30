@@ -190,9 +190,9 @@ namespace Space_Invators
             mouse = Mouse.GetState();
             IsMouseVisible = true;
             
-            if (ButtonRect.Contains(mouse.Position) == true && mouse.LeftButton == ButtonState.Pressed)
-            {  
-                _state = GameState.GamePlay;        
+            if (ButtonRect.Contains(mouse.Position) == true)
+            {
+                Debug.WriteLine("test");      
             }
 
             _spriteBatch.Begin();
