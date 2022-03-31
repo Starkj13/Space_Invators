@@ -17,7 +17,7 @@ namespace Space_Invators
         GameState _state;
         MouseState mouse;
         SpriteFont arialFont;
-        Texture2D P1Pic, BulletPic, EnemyPic, HouseMainPic, HouseDamagePic, EnemyBulletPic, Background, ButtonPic;
+        Texture2D P1Pic, BulletPic, EnemyPic, HouseMainPic, HouseDamagePic, EnemyBulletPic, Background, ButtonPic, ResetButtonPic;
         Song Music;
         SoundEffect Shoot;
         SoundEffect EnemyKilled;
@@ -34,7 +34,7 @@ namespace Space_Invators
         double yChange = Width / 10;
         int EnemyFire;
         int HouseHit = 3;
-        int EnemyBulletTimer = 300;
+        int EnemyBulletTimer = 150;
         int Score;
         int HighScore = 0;
 
@@ -58,7 +58,8 @@ namespace Space_Invators
         //Rectangle
         Rectangle RectP1 = new Rectangle(Width / 2, Height / 2 + 500, 120, 120);
         Rectangle BackgroundRect = new Rectangle(0,0, Width, Height);
-        Rectangle ButtonRect = new Rectangle(Width / 2 - 100, Height / 2, 200, 100);
+        Rectangle ButtonRect;
+        Rectangle ResetButtonRect; 
         Rectangle EnemyBulletRect;
         Rectangle BulletRect;
 
@@ -74,6 +75,10 @@ namespace Space_Invators
         Vector2 HighScorePosition = new Vector2(Width / 2, Height / 2 +120);
         Vector2 HighScoreTextPosition = new Vector2(Width / 2 -50, Height / 2 +80);
         Vector2 SceneText = new Vector2(Width / 2 - 50, Height / 2 - 600);
+
+        // Set Placment for button pics
+        Vector2 ButtonPicPlace = new Vector2(Width / 2 - 100, Height / 2 + 130);
+        Vector2 ResetButtonPlace = new Vector2(Width / 2 - 100, Height / 2 + 430);
 
         enum GameState
         {
@@ -122,35 +127,9 @@ namespace Space_Invators
             arialFont = Content.Load<SpriteFont>("arial");
             Background = Content.Load<Texture2D>("SpaceInvaders_Background");
             ButtonPic = Content.Load<Texture2D>("Start_Button");
+            ResetButtonPic = Content.Load<Texture2D>("Reset_Button");
 
-            // Add Image to House List
-            for (int i = 0; i < 3; i++)
-            {
-                HouseChangePicList.Add(Content.Load<Texture2D>("SpaceInvaders_House"));
-            }
-
-            // Add House Rects to list
-            // House 1
-            HouseChangeRectList.Add(new Rectangle(Width / 4, Height / 2 + 200, 200, 200));
-           
-            // House 2
-            HouseChangeRectList.Add(new Rectangle(Width / 3 + 180, Height / 2 + 200, 200, 200));
-            
-            // House 3
-            HouseChangeRectList.Add(new Rectangle(Width / 2 + 220, Height / 2 + 200, 200 ,200));
-            
-
-            // Set position of enenmy with start
-            for (int i = 0; i < 11; i++)
-            {
-                EnemyRectList.Add(new Rectangle(xChange, (int)yChange, 80, 80));
-                xChange += 170;
-            }
-
-            for (int i = 0; i < 3; i++)
-            {
-                HouseHealth.Add(0);
-            }
+            ListMaker();
             FileManager();
 
         }
@@ -172,17 +151,45 @@ namespace Space_Invators
                 case GameState.LastScene:
                     LastScene();
                     break;
-            }
+            }      
 
             // TODO: Add your update logic here
 
             base.Update(gameTime);
         }
 
-        protected override void Draw(GameTime gameTime)
+        void ListMaker()
         {
+            for (int i = 0; i < 3; i++)
+            {
+                HouseChangePicList.Add(Content.Load<Texture2D>("SpaceInvaders_House"));
+            }
 
-            base.Draw(gameTime);
+            // Add House Rects to list
+            // House 1
+            HouseChangeRectList.Add(new Rectangle(Width / 4, Height / 2 + 200, 200, 200));
+
+            // House 2
+            HouseChangeRectList.Add(new Rectangle(Width / 3 + 180, Height / 2 + 200, 200, 200));
+
+            // House 3
+            HouseChangeRectList.Add(new Rectangle(Width / 2 + 220, Height / 2 + 200, 200, 200));
+
+            // Placement of Buttons
+            ButtonRect = new Rectangle(Width / 2 - 100, Height / 2, ButtonPic.Width, ButtonPic.Height);
+            ResetButtonRect = new Rectangle(Width / 2 - 100, Height / 2 + 300, ResetButtonPic.Width, ResetButtonPic.Height);
+
+            // Set position of enenmy with start
+            for (int i = 0; i < 11; i++)
+            {
+                EnemyRectList.Add(new Rectangle(xChange, (int)yChange, 80, 80));
+                xChange += 170;
+            }
+
+            for (int i = 0; i < 3; i++)
+            {
+                HouseHealth.Add(0);
+            }
         }
 
         void MainMenu(GameTime gameTime)
@@ -190,16 +197,16 @@ namespace Space_Invators
             mouse = Mouse.GetState();
             IsMouseVisible = true;
             
-            if (ButtonRect.Contains(mouse.Position) == true)
+            if (ButtonRect.Contains(mouse.Position) == true && mouse.LeftButton == ButtonState.Pressed)
             {
-                Debug.WriteLine("test");      
+                _state = GameState.GamePlay;
             }
 
             _spriteBatch.Begin();
             // Button Draw
             _spriteBatch.Draw(Background, BackgroundRect, Color.White);
             _spriteBatch.DrawString(arialFont, $"Main Menu", ScoreTextPosition, Color.White);
-            _spriteBatch.Draw(ButtonPic, ButtonRect, Color.White);
+            _spriteBatch.Draw(ButtonPic, ButtonPicPlace, Color.White);
             _spriteBatch.End();
 
 
@@ -219,6 +226,7 @@ namespace Space_Invators
             _spriteBatch.Draw(HouseChangePicList[0], HouseChangeRectList[0], Color.White);
             _spriteBatch.Draw(HouseChangePicList[1], HouseChangeRectList[1], Color.White);
             _spriteBatch.Draw(HouseChangePicList[2], HouseChangeRectList[2], Color.White);
+            _spriteBatch.DrawString(arialFont,$"{Score}", SceneText, Color.White);
 
             // Draw Bullet
             if (BulletVisible == true)
@@ -261,9 +269,43 @@ namespace Space_Invators
 
         void LastScene()
         {
-            GraphicsDevice.Clear(Color.Red);
+            IsMouseVisible = true;
+            mouse = Mouse.GetState();
             if (GameOverScene)
             {
+                // Reset Button
+                if (ResetButtonRect.Contains(mouse.Position) == true && mouse.LeftButton == ButtonState.Pressed)
+                {
+                    // Ints 
+                     xChange = 80;
+                     yChange = Width / 10;
+                     EnemyFire = 0; 
+                     HouseHit = 3;
+                     EnemyBulletTimer = 150;
+                     Score = 0;
+                     HighScore = 0;
+
+                    // Bools 
+                    EnemyBulletVisible = false;
+                    BulletVisible = false;
+                    EnemyBulletSpawn = true;
+                    Hit = false;
+                    LastScen = false;
+                    GameOverScene = false;
+                    WinningScene = false;
+                    EnemyPoint = true;
+                    Housepoint = true;
+
+                    // Clear Lists
+                    HouseChangePicList.Clear();
+                    EnemyRectList.Clear();
+                    HouseHealth.Clear();
+                    HouseChangeRectList.Clear();
+                
+                    ListMaker();
+                    _state = GameState.GamePlay;
+                }
+
                 _spriteBatch.Begin();
 
                 _spriteBatch.Draw(Background, BackgroundRect, Color.White);
@@ -272,11 +314,45 @@ namespace Space_Invators
                 _spriteBatch.DrawString(arialFont, $"{Score}", ScorePosition, Color.White);
                 _spriteBatch.DrawString(arialFont, $"Highscore", HighScoreTextPosition, Color.White);
                 _spriteBatch.DrawString(arialFont, $"{HighScore}", HighScorePosition, Color.White);
+                _spriteBatch.Draw(ResetButtonPic, ResetButtonPlace, Color.White);
 
                 _spriteBatch.End();
             }
             if (WinningScene)
             {
+                // Reset Button
+                if (ResetButtonRect.Contains(mouse.Position) == true && mouse.LeftButton == ButtonState.Pressed)
+                {
+                    // Ints
+                    MovmentSpeed = 8;
+                    xChange = 80;
+                    yChange = Width / 10;
+                    EnemyFire = 0;
+                    HouseHit = 3;
+                    EnemyBulletTimer = 300;
+                    Score = 0;
+                    HighScore = 0;
+
+                    // Bools 
+                    EnemyBulletVisible = false;
+                    BulletVisible = false;
+                    EnemyBulletSpawn = true;
+                    Hit = false;
+                    LastScen = false;
+                    GameOverScene = false;
+                    WinningScene = false;
+                    EnemyPoint = true;
+                    Housepoint = true;
+                    // Clear Lists
+                    HouseChangePicList.Clear();
+                    EnemyRectList.Clear();
+                    HouseHealth.Clear();
+                    HouseChangeRectList.Clear();
+
+                    ListMaker();
+                    _state = GameState.GamePlay;
+                }
+
                 _spriteBatch.Begin();
 
                 _spriteBatch.Draw(Background, BackgroundRect, Color.White);
@@ -285,7 +361,7 @@ namespace Space_Invators
                 _spriteBatch.DrawString(arialFont, $"{Score}", ScorePosition, Color.White);
                 _spriteBatch.DrawString(arialFont, $"Highscore", HighScoreTextPosition, Color.White);
                 _spriteBatch.DrawString(arialFont, $"{HighScore}", HighScorePosition, Color.White);
-
+                _spriteBatch.Draw(ResetButtonPic, ResetButtonPlace, Color.White);
                 _spriteBatch.End();
             }
 
@@ -371,7 +447,7 @@ namespace Space_Invators
                 EnemyFire = Random.Next(0, EnemyRectList.Count);
                 EnemyBulletSpeed.Y = Random.Next(5, 10);
 
-                EnemyBulletTimer = 300;
+                EnemyBulletTimer = 150;
 
                 // Only one time bonus 
                 if (EnemyRectList.Count == 0 && EnemyPoint == true)
@@ -449,7 +525,7 @@ namespace Space_Invators
             // Loop for moving the enemys
             for (int i = 0; i < 1; i++)
             {
-                yChange += 0.2;
+                yChange += 0.4;
                 for (int j = 0; j < EnemyRectList.Count; j++)
                 {
                     Rectangle temp = new Rectangle();
