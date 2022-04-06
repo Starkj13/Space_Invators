@@ -34,7 +34,7 @@ namespace Space_Invators
         double yChange = Width / 10;
         int EnemyFire;
         int HouseHit = 3;
-        int EnemyBulletTimer = 150;
+        int EnemyBulletTimer = 200;
         int Score;
         int HighScore = 0;
 
@@ -227,6 +227,7 @@ namespace Space_Invators
             _spriteBatch.Draw(HouseChangePicList[1], HouseChangeRectList[1], Color.White);
             _spriteBatch.Draw(HouseChangePicList[2], HouseChangeRectList[2], Color.White);
             _spriteBatch.DrawString(arialFont,$"{Score}", SceneText, Color.White);
+            _spriteBatch.DrawString(arialFont, $"{HighScore}", new Vector2(Width / 2 - 200, Height / 2 - 600), Color.White);
 
             // Draw Bullet
             if (BulletVisible == true)
@@ -276,14 +277,15 @@ namespace Space_Invators
                 // Reset Button
                 if (ResetButtonRect.Contains(mouse.Position) == true && mouse.LeftButton == ButtonState.Pressed)
                 {
+                    
+
                     // Ints 
-                     xChange = 80;
+                    xChange = 80;
                      yChange = Width / 10;
                      EnemyFire = 0; 
                      HouseHit = 3;
                      EnemyBulletTimer = 150;
                      Score = 0;
-                     HighScore = 0;
 
                     // Bools 
                     EnemyBulletVisible = false;
@@ -301,7 +303,7 @@ namespace Space_Invators
                     EnemyRectList.Clear();
                     HouseHealth.Clear();
                     HouseChangeRectList.Clear();
-                
+
                     ListMaker();
                     _state = GameState.GamePlay;
                 }
@@ -323,15 +325,14 @@ namespace Space_Invators
                 // Reset Button
                 if (ResetButtonRect.Contains(mouse.Position) == true && mouse.LeftButton == ButtonState.Pressed)
                 {
-                    // Ints
-                    MovmentSpeed = 8;
+                    
+                    // Ints 
                     xChange = 80;
                     yChange = Width / 10;
                     EnemyFire = 0;
                     HouseHit = 3;
-                    EnemyBulletTimer = 300;
+                    EnemyBulletTimer = 150;
                     Score = 0;
-                    HighScore = 0;
 
                     // Bools 
                     EnemyBulletVisible = false;
@@ -343,6 +344,7 @@ namespace Space_Invators
                     WinningScene = false;
                     EnemyPoint = true;
                     Housepoint = true;
+
                     // Clear Lists
                     HouseChangePicList.Clear();
                     EnemyRectList.Clear();
@@ -445,9 +447,9 @@ namespace Space_Invators
                 EnemyBulletVisible = true;
                 
                 EnemyFire = Random.Next(0, EnemyRectList.Count);
-                EnemyBulletSpeed.Y = Random.Next(5, 10);
+                EnemyBulletSpeed.Y = Random.Next(7, 13);
 
-                EnemyBulletTimer = 150;
+                EnemyBulletTimer = 200;
 
                 // Only one time bonus 
                 if (EnemyRectList.Count == 0 && EnemyPoint == true)
