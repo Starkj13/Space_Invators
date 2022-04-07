@@ -32,6 +32,7 @@ namespace Space_Invators
         int MovmentSpeed = 8;
         int xChange = 80;
         double yChange = Width / 10;
+        double yChangeMove = Width / 10;
         int EnemyFire;
         int HouseHit = 3;
         int EnemyBulletTimer = 200;
@@ -180,10 +181,15 @@ namespace Space_Invators
             ResetButtonRect = new Rectangle(Width / 2 - 100, Height / 2 + 300, ResetButtonPic.Width, ResetButtonPic.Height);
 
             // Set position of enenmy with start
-            for (int i = 0; i < 11; i++)
+            for (int j = 0; j < 4; j++)
             {
-                EnemyRectList.Add(new Rectangle(xChange, (int)yChange, 80, 80));
-                xChange += 170;
+                for (int i = 0; i < 11; i++)
+                {
+                    EnemyRectList.Add(new Rectangle(xChange, (int)yChange, 80, 80));
+                    xChange += 170;
+                }
+                yChange += 90;
+                xChange = 80;
             }
 
             for (int i = 0; i < 3; i++)
@@ -523,20 +529,21 @@ namespace Space_Invators
 
         void EnemyMovment()
         {
-
             // Loop for moving the enemys
             for (int i = 0; i < 1; i++)
             {
-                yChange += 0.4;
+                yChangeMove += 0.1;
+
                 for (int j = 0; j < EnemyRectList.Count; j++)
                 {
+                    
                     Rectangle temp = new Rectangle();
                     temp = EnemyRectList[j];
-                    temp.Y = (int)yChange;
+                    temp.Y = (int)yChangeMove;
                     EnemyRectList[j] = temp;
 
                     // Check if Enemy has past finish line
-                    if (EnemyRectList[i].Intersects(RectP1) == true || temp.Y > Height / 2 + 200)
+                    if (EnemyRectList[j].Intersects(RectP1) == true || temp.Y > Height / 2 + 200)
                     {
                         LastScen = true;
                         GameOverScene = true;
