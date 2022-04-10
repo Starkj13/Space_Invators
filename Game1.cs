@@ -1,12 +1,12 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
-using Microsoft.Xna.Framework.Audio;
 using System;
-using System.IO;
-using System.Diagnostics;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 
 namespace Space_Invators
 {
@@ -32,7 +32,7 @@ namespace Space_Invators
         int MovmentSpeed = 8;
         int xChange = 80;
         double yChange = Width / 10;
-        double yChangeMove = Width / 10;
+        int yChangeMove = 1;
         int EnemyFire;
         int HouseHit = 3;
         int EnemyBulletTimer = 200;
@@ -49,6 +49,7 @@ namespace Space_Invators
         bool WinningScene = false;
         bool EnemyPoint = true;
         bool Housepoint = true;
+        bool OneHit = false;
 
         // Lists
         List<int> HouseHealth = new List<int>();
@@ -58,9 +59,9 @@ namespace Space_Invators
 
         //Rectangle
         Rectangle RectP1 = new Rectangle(Width / 2, Height / 2 + 500, 120, 120);
-        Rectangle BackgroundRect = new Rectangle(0,0, Width, Height);
+        Rectangle BackgroundRect = new Rectangle(0, 0, Width, Height);
         Rectangle ButtonRect;
-        Rectangle ResetButtonRect; 
+        Rectangle ResetButtonRect;
         Rectangle EnemyBulletRect;
         Rectangle BulletRect;
 
@@ -72,9 +73,9 @@ namespace Space_Invators
 
         // Scorebord
         Vector2 ScorePosition = new Vector2(Width / 2, Height / 2 - 80);
-        Vector2 ScoreTextPosition = new Vector2(Width / 2 -25, Height / 2 - 120);
-        Vector2 HighScorePosition = new Vector2(Width / 2, Height / 2 +120);
-        Vector2 HighScoreTextPosition = new Vector2(Width / 2 -50, Height / 2 +80);
+        Vector2 ScoreTextPosition = new Vector2(Width / 2 - 25, Height / 2 - 120);
+        Vector2 HighScorePosition = new Vector2(Width / 2, Height / 2 + 120);
+        Vector2 HighScoreTextPosition = new Vector2(Width / 2 - 50, Height / 2 + 80);
         Vector2 SceneText = new Vector2(Width / 2 - 50, Height / 2 - 600);
 
         // Set Placment for button pics
@@ -94,7 +95,7 @@ namespace Space_Invators
             _graphics.PreferredBackBufferWidth = Width;
             _graphics.PreferredBackBufferHeight = Height;
             _graphics.ApplyChanges();
-           
+
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
         }
@@ -152,7 +153,7 @@ namespace Space_Invators
                 case GameState.LastScene:
                     LastScene();
                     break;
-            }      
+            }
 
             // TODO: Add your update logic here
 
@@ -202,7 +203,7 @@ namespace Space_Invators
         {
             mouse = Mouse.GetState();
             IsMouseVisible = true;
-            
+
             if (ButtonRect.Contains(mouse.Position) == true && mouse.LeftButton == ButtonState.Pressed)
             {
                 _state = GameState.GamePlay;
@@ -232,7 +233,7 @@ namespace Space_Invators
             _spriteBatch.Draw(HouseChangePicList[0], HouseChangeRectList[0], Color.White);
             _spriteBatch.Draw(HouseChangePicList[1], HouseChangeRectList[1], Color.White);
             _spriteBatch.Draw(HouseChangePicList[2], HouseChangeRectList[2], Color.White);
-            _spriteBatch.DrawString(arialFont,$"{Score}", SceneText, Color.White);
+            _spriteBatch.DrawString(arialFont, $"{Score}", SceneText, Color.White);
             _spriteBatch.DrawString(arialFont, $"{HighScore}", new Vector2(Width / 2 - 200, Height / 2 - 600), Color.White);
 
             // Draw Bullet
@@ -253,7 +254,7 @@ namespace Space_Invators
                 _spriteBatch.Draw(EnemyPic, rect, Color.White);
             }
             _spriteBatch.End();
-    
+
 
             if (LastScen == true)
             {
@@ -283,15 +284,15 @@ namespace Space_Invators
                 // Reset Button
                 if (ResetButtonRect.Contains(mouse.Position) == true && mouse.LeftButton == ButtonState.Pressed)
                 {
-                    
+
 
                     // Ints 
                     xChange = 80;
-                     yChange = Width / 10;
-                     EnemyFire = 0; 
-                     HouseHit = 3;
-                     EnemyBulletTimer = 150;
-                     Score = 0;
+                    yChange = Width / 10;
+                    EnemyFire = 0;
+                    HouseHit = 3;
+                    EnemyBulletTimer = 150;
+                    Score = 0;
 
                     // Bools 
                     EnemyBulletVisible = false;
@@ -331,7 +332,7 @@ namespace Space_Invators
                 // Reset Button
                 if (ResetButtonRect.Contains(mouse.Position) == true && mouse.LeftButton == ButtonState.Pressed)
                 {
-                    
+
                     // Ints 
                     xChange = 80;
                     yChange = Width / 10;
@@ -382,11 +383,11 @@ namespace Space_Invators
             KeyboardState KeyboardState = Keyboard.GetState();
 
             // Move Player with Keyboard
-            if (KeyboardState.IsKeyDown(Keys.A) && RectP1.X !> 0)
+            if (KeyboardState.IsKeyDown(Keys.A) && RectP1.X! > 0)
             {
                 RectP1.X -= MovmentSpeed;
             }
-            if (KeyboardState.IsKeyDown(Keys.D) && RectP1.X !< Width -85)
+            if (KeyboardState.IsKeyDown(Keys.D) && RectP1.X! < Width - 85)
             {
                 RectP1.X += MovmentSpeed;
             }
@@ -424,6 +425,7 @@ namespace Space_Invators
                     Hit = false;
                     Score += 50;
                     BulletVisible = false;
+                    OneHit = true;
                 }
             }
 
@@ -451,7 +453,7 @@ namespace Space_Invators
             if (EnemyBulletTimer == 0 && EnemyBulletSpawn == true)
             {
                 EnemyBulletVisible = true;
-                
+
                 EnemyFire = Random.Next(0, EnemyRectList.Count);
                 EnemyBulletSpeed.Y = Random.Next(7, 13);
 
@@ -491,11 +493,11 @@ namespace Space_Invators
             {
                 // EnemyBullet hit Houses check
                 if (HouseChangeRectList[i].Intersects(EnemyBulletRect) == true && HouseHealth[i] != 1)
-                {    
+                {
                     HouseChangePicList[i] = HouseDamagePic;
                     HouseHealth[i]++;
                 }
-            }   
+            }
         }
 
         void HousePoint()
@@ -507,10 +509,10 @@ namespace Space_Invators
                 LastScen = true;
                 GameOverScene = true;
             }
-           
+
             // Check House life and give point
             if (HouseHealth[0] + HouseHealth[1] + HouseHealth[2] == 0 && LastScen == true && Housepoint == true)
-            { 
+            {
                 Score += 100;
                 Housepoint = false;
             }
@@ -528,26 +530,19 @@ namespace Space_Invators
         }
 
         void EnemyMovment()
-        {
-            // Loop for moving the enemys
-            for (int i = 0; i < 1; i++)
-            {
-                yChangeMove += 0.1;
+        {  
+            for (int i = 0; i < EnemyRectList.Count; i++)
+            {     
+                Rectangle temp = new Rectangle();
+                temp = EnemyRectList[i];
+                temp.Y += yChangeMove;
+                EnemyRectList[i] = temp;
 
-                for (int j = 0; j < EnemyRectList.Count; j++)
+                // Check if Enemy has past finish line
+                if (EnemyRectList[i].Intersects(RectP1) == true || temp.Y > Height / 2 + 200)
                 {
-                    
-                    Rectangle temp = new Rectangle();
-                    temp = EnemyRectList[j];
-                    temp.Y = (int)yChangeMove;
-                    EnemyRectList[j] = temp;
-
-                    // Check if Enemy has past finish line
-                    if (EnemyRectList[j].Intersects(RectP1) == true || temp.Y > Height / 2 + 200)
-                    {
-                        LastScen = true;
-                        GameOverScene = true;
-                    }
+                    LastScen = true;
+                    GameOverScene = true;
                 }
             }
         }
