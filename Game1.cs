@@ -284,8 +284,6 @@ namespace Space_Invators
                 // Reset Button
                 if (ResetButtonRect.Contains(mouse.Position) == true && mouse.LeftButton == ButtonState.Pressed)
                 {
-
-
                     // Ints 
                     xChange = 80;
                     yChange = Width / 10;
@@ -310,6 +308,10 @@ namespace Space_Invators
                     EnemyRectList.Clear();
                     HouseHealth.Clear();
                     HouseChangeRectList.Clear();
+
+                    BulletSpeed.Y = 0;
+                    BulletPosition.Y = 0;
+                    BulletPosition.X = 0;
 
                     ListMaker();
                     _state = GameState.GamePlay;
@@ -332,7 +334,6 @@ namespace Space_Invators
                 // Reset Button
                 if (ResetButtonRect.Contains(mouse.Position) == true && mouse.LeftButton == ButtonState.Pressed)
                 {
-
                     // Ints 
                     xChange = 80;
                     yChange = Width / 10;
@@ -357,6 +358,10 @@ namespace Space_Invators
                     EnemyRectList.Clear();
                     HouseHealth.Clear();
                     HouseChangeRectList.Clear();
+
+                    BulletSpeed.Y = 0;
+                    BulletPosition.Y = 0;
+                    BulletPosition.X = 0;
 
                     ListMaker();
                     _state = GameState.GamePlay;
@@ -418,14 +423,17 @@ namespace Space_Invators
             // Enemy hit by bullet
             for (int i = 0; i < EnemyRectList.Count; i++)
             {
-                if (EnemyRectList[i].Intersects(BulletRect) == true)
+                if (EnemyRectList[i].Intersects(BulletRect) == true && OneHit == false)
                 {
                     EnemyRectList.RemoveAt(i);
                     EnemyKilled.Play();
-                    Hit = false;
                     Score += 50;
                     BulletVisible = false;
                     OneHit = true;
+                    Hit = false;
+                    BulletSpeed.Y = 0;
+                    BulletPosition.Y = 0;
+                    BulletPosition.X = 0;
                 }
             }
 
@@ -439,6 +447,7 @@ namespace Space_Invators
                 {
                     BulletVisible = false;
                     Hit = false;
+                    OneHit = false;
                 }
             }
 
