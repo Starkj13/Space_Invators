@@ -287,6 +287,8 @@ namespace Space_Invators
                 // Reset Button
                 if (ResetButtonRect.Contains(mouse.Position) == true && mouse.LeftButton == ButtonState.Pressed)
                 {
+                    FileManager();
+
                     // Ints 
                     xChange = 80;
                     yChange = Width / 10;
@@ -338,6 +340,8 @@ namespace Space_Invators
                 // Reset Button
                 if (ResetButtonRect.Contains(mouse.Position) == true && mouse.LeftButton == ButtonState.Pressed)
                 {
+                    FileManager();
+
                     // Ints 
                     xChange = 80;
                     yChange = Width / 10;
@@ -383,9 +387,7 @@ namespace Space_Invators
                 _spriteBatch.Draw(ResetButtonPic, ResetButtonPlace, Color.White);
                 _spriteBatch.End();
             }
-
             HousePoint();
-            FileManager();
         }
 
         void MovementPlayer()
