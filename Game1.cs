@@ -38,6 +38,7 @@ namespace Space_Invators
         int EnemyBulletTimer = 200;
         int Score;
         int HighScore = 0;
+        int timer = 0;
 
         // Bools 
         bool EnemyBulletVisible = false;
@@ -225,6 +226,7 @@ namespace Space_Invators
             KeyboardState KeyboardState = Keyboard.GetState();
             mouse = Mouse.GetState();
             IsMouseVisible = false;
+            timer++;
             _spriteBatch.Begin();
 
             // Player Draw
@@ -251,7 +253,8 @@ namespace Space_Invators
             // Draw Enemy
             foreach (Rectangle rect in EnemyRectList)
             {
-                _spriteBatch.Draw(EnemyPic, rect, Color.White);
+             _spriteBatch.Draw(EnemyPic, rect, Color.White);
+
             }
             _spriteBatch.End();
 
@@ -291,6 +294,7 @@ namespace Space_Invators
                     HouseHit = 3;
                     EnemyBulletTimer = 150;
                     Score = 0;
+                    timer = 0;
 
                     // Bools 
                     EnemyBulletVisible = false;
@@ -341,6 +345,7 @@ namespace Space_Invators
                     HouseHit = 3;
                     EnemyBulletTimer = 150;
                     Score = 0;
+                    timer = 0;
 
                     // Bools 
                     EnemyBulletVisible = false;
@@ -409,7 +414,7 @@ namespace Space_Invators
             }
 
             // Set bullet hit to false if it out of screen
-            if (BulletPosition.Y < -Height / 2)
+            if (BulletPosition.Y < -Height/2)
             {
                 Hit = false;
             }
@@ -443,7 +448,7 @@ namespace Space_Invators
                 Rectangle temp = new Rectangle();
                 temp = EnemyRectList[i];
 
-                if (BulletRect.Y < temp.Y)
+                if (BulletRect.Y < temp.Y - 300)
                 {
                     BulletVisible = false;
                     Hit = false;
@@ -541,17 +546,20 @@ namespace Space_Invators
         void EnemyMovment()
         {  
             for (int i = 0; i < EnemyRectList.Count; i++)
-            {     
-                Rectangle temp = new Rectangle();
-                temp = EnemyRectList[i];
-                temp.Y += yChangeMove;
-                EnemyRectList[i] = temp;
-
-                // Check if Enemy has past finish line
-                if (EnemyRectList[i].Intersects(RectP1) == true || temp.Y > Height / 2 + 200)
+            {
+                if (timer % 30 == 0)
                 {
-                    LastScen = true;
-                    GameOverScene = true;
+                    Rectangle temp = new Rectangle();
+                    temp = EnemyRectList[i];
+                    temp.Y += yChangeMove;
+                    EnemyRectList[i] = temp;
+
+                    // Check if Enemy has past finish line
+                    if (EnemyRectList[i].Intersects(RectP1) == true || temp.Y > Height / 2 + 200)
+                    {
+                        LastScen = true;
+                        GameOverScene = true;
+                    }
                 }
             }
         }
