@@ -5,7 +5,6 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 
 namespace Space_Invators
@@ -226,7 +225,7 @@ namespace Space_Invators
             KeyboardState KeyboardState = Keyboard.GetState();
             mouse = Mouse.GetState();
             IsMouseVisible = false;
-            timer++;
+            timer += 20;
             _spriteBatch.Begin();
 
             // Player Draw
@@ -253,7 +252,7 @@ namespace Space_Invators
             // Draw Enemy
             foreach (Rectangle rect in EnemyRectList)
             {
-             _spriteBatch.Draw(EnemyPic, rect, Color.White);
+                _spriteBatch.Draw(EnemyPic, rect, Color.White);
 
             }
             _spriteBatch.End();
@@ -262,7 +261,6 @@ namespace Space_Invators
             if (LastScen == true)
             {
                 _state = GameState.LastScene;
-                LastScene();
             }
 
             BulletPosition += BulletSpeed;
@@ -308,6 +306,7 @@ namespace Space_Invators
                     WinningScene = false;
                     EnemyPoint = true;
                     Housepoint = true;
+                    OneHit = false;
 
                     // Clear Lists
                     HouseChangePicList.Clear();
@@ -342,7 +341,6 @@ namespace Space_Invators
                 {
                     FileManager();
 
-                    // Ints 
                     xChange = 80;
                     yChange = Width / 10;
                     EnemyFire = 0;
@@ -361,6 +359,7 @@ namespace Space_Invators
                     WinningScene = false;
                     EnemyPoint = true;
                     Housepoint = true;
+                    OneHit = false;
 
                     // Clear Lists
                     HouseChangePicList.Clear();
@@ -416,7 +415,7 @@ namespace Space_Invators
             }
 
             // Set bullet hit to false if it out of screen
-            if (BulletPosition.Y < -Height/2)
+            if (BulletPosition.Y < -Height / 2)
             {
                 Hit = false;
             }
@@ -546,7 +545,7 @@ namespace Space_Invators
         }
 
         void EnemyMovment()
-        {  
+        {
             for (int i = 0; i < EnemyRectList.Count; i++)
             {
                 if (timer % 30 == 0)
